@@ -10,21 +10,19 @@ if [ ! -f "$1" ]; then
 fi
 
 readonly SHARE_DIR='/usr/local/share/prebackup'
-readonly SCRIPT_FILE="$1"; shift
+readonly SCRIPT_FILE="$1"
 readonly SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_FILE")" && pwd)"
 
 configs=(
 	'/etc/bacula/prebackup.conf'
 	"${SCRIPT_DIR}/config"
 )
-if [ -f "$2" ]; then
-	configs+=(":$2"); shift
-fi
 command="$(basename "$SCRIPT_FILE")"
 
 # Global variables that may be overriden by a config file or CLI arguments,
 # but these are set to read-only after the setup phase.
 NAME="$(basename "$SCRIPT_DIR")"
+RUN_AS=
 SYSLOG='yes'
 TARGET_DIR='/var/tmp/backup'
 TEMP_DIR='/tmp/prebackup'
@@ -39,7 +37,7 @@ for file in "${configs[@]}"; do
 		debug "Loading variables from: $(readlink -f $file)"
 		source "$file"
 	else
-		debug "Config file '$file' does not exist."
+		info "Config file '$file' does not exist."
 	fi
 done
 
@@ -48,6 +46,22 @@ done
 : ${target_dir:=$TARGET_DIR/$NAME}
 : ${temp_dir:=$TEMP_DIR/$NAME}
 
+# Prepare directories.
+mkdir -p -m 750 "$temp_dir"
+mkdir -p -m 750 "$target_dir"
+
+# If $RUN_AS is set and differs from the current user, then execute this script
+# under the $RUN_AS user and exit.
+if [[ -n "$RUN_AS" && "${RUN_AS%:*}" != "$(id -un)" ]]; then
+	chown "$RUN_AS" "$temp_dir" "$target_dir"
+
+	su "${RUN_AS%:*}" --preserve-environment <<-EOF
+		$0 $@
+	EOF
+	exit 0
+fi
+
+shift
 while [ $# -gt 0 ]; do
 	case $1 in
 		-c | --command)
@@ -68,10 +82,7 @@ while [ $# -gt 0 ]; do
 	esac
 done
 
-readonly NAME SYSLOG SYSLOG_TAG TARGET_DIR TEMP_DIR VERBOSE
-
-# Include actual script (hook) file.
-source "$SCRIPT_FILE"
+readonly NAME RUN_AS SYSLOG SYSLOG_TAG TARGET_DIR TEMP_DIR VERBOSE
 
 if [ "$SYSLOG" = 'yes' ]; then
 	# Close file descriptor for STDOUT and STDERR.
@@ -85,9 +96,8 @@ if [ "$SYSLOG" = 'yes' ]; then
 	exec 2>&1
 fi
 
-# Prepare directories
-mkdir -p "$temp_dir" "$target_dir"
-chmod 750 "$TEMP_DIR" "$TARGET_DIR"
+# Include actual script (hook) file.
+source "$SCRIPT_FILE"
 
 # Run setup hook if defined.
 if type -t setup &>/dev/null; then
