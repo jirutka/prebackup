@@ -1,0 +1,19 @@
+#!/usr/local/bin/prebackup
+# vim: set ft=sh ts=4:
+
+setup() {
+	required-var 'mongo_user'
+	required-var 'mongo_password'
+}
+
+pre-backup() {
+	mongodump --username="$mongo_user" --password="$mongo_password" \
+		--authenticationDatabase=admin --quiet --out="$target_dir"
+}
+
+post-backup() {
+	if [ ! -d "$target_dir" ]; then
+		fail "$target_dir does not exist or not a directory!"
+	fi
+	rm -Rf "$target_dir"/*
+}
