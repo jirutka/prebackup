@@ -1,0 +1,33 @@
+= PreBackup
+Jakub Jirutka <https://github.com/jirutka[@jirutka]>
+
+TODO
+
+== Directory structure
+
+----
+/
+|-- etc
+|   `-- bacula
+|       |-- service1
+|       |   |-- config
+|       |   |-- post-backup ---------+
+|       |   `-- pre-backup ----------+
+|       `-- serviceN                 |
+|       |   |-- config               |
+|       |   |-- post-backup ------+  |
+|       |   `-- pre-backup -------+  |
+|       `-- prebackup.conf        |  |
+`-- usr(/local)                   |  |
+    |-- bin                       |  |
+    |   `-- prebackup             |  |
+    `-- share                     |  |
+        `-- prebackup             |  |
+            |-- btrfs-snapshot <--+  |
+            |-- postgresql <---------+
+            `-- ...
+----
+
+== License
+
+This project is licensed under http://opensource.org/licenses/MIT/[MIT License].
