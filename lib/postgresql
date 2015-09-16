@@ -1,0 +1,24 @@
+#!/usr/local/bin/prebackup
+# vim: set ft=sh ts=4:
+
+pre-backup() {
+	local dbname
+	local list_dbs="SELECT datname FROM pg_database \
+					WHERE NOT datname IN ('template0') ORDER BY datname;"
+
+	info 'Dumping global objects'
+	pg_dumpall --globals-only | gzip > "$target_dir/globals.sql.gz"
+
+	for dbname in $(psql --no-psqlrc --no-align --tuples-only --command="$list_dbs"); do
+		info "Dumping database $dbname"
+		pg_dump --dbname="$dbname" --format=c --file="$target_dir/$dbname.dump"
+	done
+}
+
+post-backup() {
+	if [ ! -d "$target_dir" ]; then
+		fail "$target_dir does not exist or not a directory!"
+	fi
+	rm -Rf "$target_dir"/globals.sql.gz
+	rm -Rf "$target_dir"/*.dump
+}
