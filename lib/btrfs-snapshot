@@ -1,0 +1,29 @@
+#!/usr/local/bin/prebackup
+# vim: set ft=sh ts=4:
+
+setup() {
+	required-var 'source_dev'
+	required-var 'source_subvol'
+
+	target_dir=${target_dir}/${name}
+	mount_point="${temp_dir}/${source_dev#*=}-${source_subvol}"
+}
+
+pre-backup() {
+	local snapshot_name="@${source_subvol}-$(date '+%s')"
+
+	mkdir -p "$mount_point"
+	mount -t btrfs "$source_dev" "$mount_point"
+	btrfs subvolume snapshot -r "${mount_point}/${source_subvol}" "${mount_point}/${snapshot_name}"
+
+	mount -t btrfs "$source_dev" --read-only -o subvol="$snapshot_name" "$target_dir"
+}
+
+post-backup() {
+	local snapshot_name=$(btrfs subvolume show "$target_dir" | sed -rn 's/\s*Name:\s+(.*)$/\1/p')
+
+	umount "$target_dir"
+	btrfs subvolume delete "$mount_point/$snapshot_name"
+
+	umount "$mount_point"
+}
