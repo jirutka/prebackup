@@ -85,15 +85,8 @@ done
 readonly NAME RUN_AS SYSLOG SYSLOG_TAG TARGET_DIR TEMP_DIR VERBOSE
 
 if [ "$SYSLOG" = 'yes' ]; then
-	# Close file descriptor for STDOUT and STDERR.
-	exec 1<&-
-	exec 2<&-
-
-	# Redirect STDOUT to syslog.
-	exec 1> >(logger -i -t "${SYSLOG_TAG}")
-
-	# Redirect STDERR to STDOUT.
-	exec 2>&1
+	# Redirect STDOUT and STDERR to syslog and STDOUT.
+	exec 1> >(tee | logger -i -t "$SYSLOG_TAG") 2>&1
 fi
 
 # Include actual script (hook) file.
