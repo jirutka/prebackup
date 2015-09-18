@@ -14,10 +14,10 @@ info() {
 	echo "$1" >&2
 }
 
-# Log message to stderr if verbose=yes.
+# Log message to stderr if VERBOSE=yes.
 # $1: message
 debug() {
-	if [ "$verbose" == 'yes' ]; then
+	if [ "$VERBOSE" == 'yes' ]; then
 		echo "DEBUG: $1" >&2
 	fi
 }
