@@ -1,4 +1,4 @@
-# Utility functions for backup hooks.
+# Utility functions for prebackup scripts.
 
 # Log error message and exit.
 # $1: message
@@ -22,7 +22,7 @@ debug() {
 	fi
 }
 
-# If the specified variable is empty, then fail with an error message.
+# If the specified variable is empty, then log error message and exit.
 # $1: variable name
 required-var() {
 	if [ -z "${!1}" ]; then
