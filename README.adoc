@@ -3,11 +3,28 @@ Jakub Jirutka <https://github.com/jirutka[@jirutka]>
 
 TODO
 
+
 == Script Format
 
 PreBackup script is a Plain Old Shell Script (actually a Bash script to be precise) with few simple conventions (just like OpenRC runscripts, ebuilds etc.)
 
+You should use https://en.wikipedia.org/wiki/Shebang_%28Unix%29[shebang] with path of the master link:bin/prebackup[prebackup] script.
+Then you must define functions `pre-backup`, `post-backup` and optionally `setup`.
+
+setup()::
+  If defined, then this function is executed before each `pre-backup()` and `post-backup()`, in the same environment.
+  You may use it to check if required variables are set (using `required-var()`), to define some common variables or anything else that should be run before `pre-backup()` and `post-backup()`.
+
+pre-backup()::
+  This function is executed when you run the script as a file named `pre-backup` (e.g. using symlink) or with argument `-c pre-backup`.
+  As the name suggests, it should be run _before_ actual backup, e.g. to dump database, create filesystem snapshot, …
+
+post-backup()::
+  This function is executed when you run the script as a file named `post-backup` (e.g. using symlink) or with argument `-c post-backup`.
+  It should be run _after_ actual backup, e.g. to clean database dumps, destroy filesystem snapshot, …
+
 [source, sh]
+.Prebackup Script Template
 ----
 #!/usr/local/bin/prebackup
 # vim: set ft=sh ts=4:
@@ -28,7 +45,14 @@ post-backup() {
 
 == Configuration
 
-TODO
+There are two places where you can define variables for a prebackup script:
+
+* `/etc/bacula/prebackup.conf` – global configuration file (you can modify this path in link:bin/prebackup[]),
+* `./config` – local configuration file located in the same directory as the pair of `pre-backup` and `post-backup` symlinks (or file and symlink) used to run the script for a particular job.
+
+These files are nothing more than another shell scripts, but you _should_ define only variables here.
+The files are sourced in the defined order before an actual prebackup script.
+If both files exist and define the same variable, then local config overrides the global.
 
 
 == Predefined Variables
@@ -101,7 +125,7 @@ required-var()::
   * $1: variable name
 
 
-== Directory Structure
+== Recommended Directory Structure
 
 ----
 /
