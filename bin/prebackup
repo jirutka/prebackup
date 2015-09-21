@@ -34,10 +34,8 @@ source "$SHARE_DIR/utils.sh"
 # Include config files.
 for file in "${configs[@]}"; do
 	if [ -f "$file" ]; then
-		debug "Loading variables from: $(readlink -f $file)"
+		echo "Loading variables from: $(readlink -f $file)" >&2
 		source "$file"
-	else
-		info "Config file '$file' does not exist."
 	fi
 done
 
