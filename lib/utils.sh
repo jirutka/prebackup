@@ -43,3 +43,20 @@ required-var() {
 		fail "Variable $1 must not be empty!" 3
 	fi
 }
+
+# Test if the specified variable is an array.
+# $1: variable name
+is-array() {
+	[[ "$(declare -p $1 2>/dev/null)" =~ 'declare -a' ]]
+}
+
+# Test if the first argument is equal to one of the subsequent arguments,
+# i.e. if array ${@:2} includes $1.
+# $1: needle
+# $@: elemenets
+is-member() {
+	local needle="$1"
+	local sep=$'\x1F'
+	shift
+	[[ "$(printf "${sep}%s${sep}" "$@")" == *"${sep}${needle}${sep}"* ]]
+}

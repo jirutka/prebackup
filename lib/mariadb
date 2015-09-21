@@ -1,0 +1,38 @@
+#!/usr/local/bin/prebackup
+# vim: set ft=sh ts=4:
+#
+# Variables:
+#   exclude_dbs : An array of database names to exclude from backup (optional).
+#
+#   my_cnf_file : Path of mysql/mariadb options file that will be passed to
+#                 --defaults-extra-file. This is a way how you can provide
+#                 credentials for DB server. Default is ~/.my.cnf.
+
+setup() {
+	if [ -n "$exclude_dbs" ] && ! is-array exclude_dbs; then
+		fail 'Variable $exclude_dbs must be an array!'
+	fi
+	exclude_dbs+=( 'information_schema' 'performance_schema' )
+	myopts="--defaults-extra-file=${my_cnf_file:-~/.my.cnf}"
+}
+
+pre-backup() {
+	local dbname
+
+	mysql $myopts --batch --skip-column-names -e 'show databases' | while read -r dbname; do
+
+		if is-member "$dbname" "${exclude_dbs[@]}"; then
+			info "Skipping database $dbname"
+		else
+			info "Dumping database $dbname"
+			mysqldump $myopts --databases "$dbname" | gzip > "${target_dir}/${dbname}.sql.gz"
+		fi
+	done
+}
+
+post-backup() {
+	if [ ! -d "$target_dir" ]; then
+		fail "$target_dir does not exist or not a directory!"
+	fi
+	rm -Rf "$target_dir"/*.sql.gz
+}
