@@ -1,7 +1,20 @@
 = PreBackup
 Jakub Jirutka <https://github.com/jirutka[@jirutka]>
 
-TODO
+This project aims to provide simple conventions and support for writing {pre,post}-backup scripts with minimal boilerplate, and also provide some common scripts (e.g. for Btrfs snapshots, PostgreSQL…).
+
+The first thing we should clarify: this project is _not_ a backup solution.
+So what it actually is?
+Well, many backup solutions, like http://www.bacula.org[Bacula] or just simple rsync, work only with files.
+The problem is that you often can’t just copy bunch of files from a running system.
+You need to dump a SQL database, create a snapshot on Btrfs/ZFS/LVM, … to prepare files that will be actually backed up.
+When the backup is done, then you usually want to remove dumps, destroy snapshots etc.
+Here comes on the scene PreBackup.
+
+PreBackup is a supplement to a file-oriented backup software, its task is to prepare files to be backed up and do cleanup when it’s done.
+
+It was originally written to be used with Bacula, but it’s totally independent from it.
+The only assumption we have is that a backup software is able to execute some command before and after it do a backup.
 
 
 == Script Format
