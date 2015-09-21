@@ -99,6 +99,7 @@ case "$command" in
 	pre-backup | post-backup)
 		info "Running $command for $NAME"
 		eval $command
+		info "Completed $command for $NAME"
 		;;
 	*)
 		fail "Unknown command: $command"
