@@ -1,17 +1,32 @@
 #!/usr/local/bin/prebackup
 # vim: set ft=sh ts=4:
+#
+# Variables:
+#   exclude_dbs : An array of database names to exclude from backup (optional).
+
+setup() {
+	if [ -n "$exclude_dbs" ] && ! is-array exclude_dbs; then
+		fail 'Variable $exclude_dbs must be an array!'
+	fi
+	exclude_dbs+=( 'template0' )
+}
 
 pre-backup() {
 	local dbname
-	local list_dbs="SELECT datname FROM pg_database \
-					WHERE NOT datname IN ('template0') ORDER BY datname;"
+	local dbs_list_sql='SELECT datname FROM pg_database ORDER BY datname;'
+	local psql_opts='--no-psqlrc --no-align --tuples-only'
 
 	info 'Dumping global objects'
 	pg_dumpall --globals-only | gzip > "$target_dir/globals.sql.gz"
 
-	for dbname in $(psql --no-psqlrc --no-align --tuples-only --command="$list_dbs"); do
-		info "Dumping database $dbname"
-		pg_dump --dbname="$dbname" --format=c --file="$target_dir/$dbname.dump"
+	psql $psql_opts --command="$dbs_list_sql" | while read -r dbname; do
+
+		if is-member "$dbname" "${exclude_dbs[@]}"; then
+			info "Skipping database $dbname"
+		else
+			info "Dumping database $dbname"
+			pg_dump --dbname="$dbname" --format=c --file="${target_dir}/${dbname}.dump"
+		fi
 	done
 }
 
