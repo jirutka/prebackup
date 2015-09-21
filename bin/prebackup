@@ -9,7 +9,7 @@ if [ ! -f "$1" ]; then
 	exit 2
 fi
 
-readonly VERSION='0.1.0'
+readonly VERSION='0.2.0'
 readonly SHARE_DIR='/usr/local/share/prebackup'
 readonly SCRIPT_FILE="$1"
 readonly SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_FILE")" && pwd)"
