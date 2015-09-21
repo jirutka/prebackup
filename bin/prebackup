@@ -24,8 +24,8 @@ command="$(basename "$SCRIPT_FILE")"
 NAME="$(basename "$SCRIPT_DIR")"
 RUN_AS=
 SYSLOG='yes'
-TARGET_DIR='/var/tmp/backup'
-TEMP_DIR='/tmp/prebackup'
+BASE_TARGET_DIR='/var/tmp/backup'
+BASE_TEMP_DIR='/tmp/prebackup'
 VERBOSE='no'
 
 # Include shared utils.
@@ -43,8 +43,8 @@ done
 
 # Assign default values if not set.
 : ${SYSLOG_TAG:=backup:$NAME}
-: ${target_dir:=$TARGET_DIR/$NAME}
-: ${temp_dir:=$TEMP_DIR/$NAME}
+: ${target_dir:=$BASE_TARGET_DIR/$NAME}
+: ${temp_dir:=$BASE_TEMP_DIR/$NAME}
 
 # Prepare directories.
 mkdir -p -m 750 "$temp_dir"
@@ -82,7 +82,7 @@ while [ $# -gt 0 ]; do
 	esac
 done
 
-readonly NAME RUN_AS SYSLOG SYSLOG_TAG TARGET_DIR TEMP_DIR VERBOSE
+readonly NAME RUN_AS SYSLOG SYSLOG_TAG BASE_TARGET_DIR BASE_TEMP_DIR VERBOSE
 
 if [ "$SYSLOG" = 'yes' ]; then
 	# Redirect STDOUT and STDERR to syslog and STDOUT.
