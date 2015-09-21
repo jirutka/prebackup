@@ -84,9 +84,9 @@ done
 
 readonly NAME RUN_AS SYSLOG SYSLOG_TAG BASE_TARGET_DIR BASE_TEMP_DIR VERBOSE
 
-if [ "$SYSLOG" = 'yes' ]; then
+if [ "$SYSLOG" == 'yes' ]; then
 	# Redirect STDOUT and STDERR to syslog and STDOUT.
-	exec 1> >(tee | logger -i -t "$SYSLOG_TAG") 2>&1
+	exec 1> >(tee | logger -t "$SYSLOG_TAG" -p local0.debug) 2>&1
 fi
 
 # Include actual script (hook) file.
