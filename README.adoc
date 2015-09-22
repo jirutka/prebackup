@@ -30,6 +30,49 @@ The only requirement is that your backup software can execute some command befor
 TBD
 
 
+== Provided Scripts
+
+=== btrfs-snapshot
+
+Creates snapshot of Btrfs subvolume.
+
+source_dev::
+  The device with Btrfs filesystem that contains the subvolume you want to backup. Format is the same as in mount (e.g. `/dev/sda2`, `LABEL=btrfsvol`). This variable is required.
+source_subvol::
+  Name of the Btrfs subvolume that should be backed up. This variable is required.
+
+=== mariadb
+
+Dumps MariaDB (formerly MySQL) databases.
+
+exclude_dbs::
+  An array of database names to exclude from backup (optional).
+my_cnf_file::
+  Path of mysql/mariadb options file that will be passed to `--defaults-extra-file`.This is a way how you can provide credentials for DB server. Default is `~/.my.cnf`.
+
+=== mongodb
+
+Dumps MongoDB databases.
+
+exclude_dbs::
+  An array of database names to exclude from backup (optional).
+mongo_password::
+  Password for authentication (optional).
+mongo_user::
+  Username for authentication (optional).
+
+=== noop
+
+Does nothing…
+
+=== postgresql
+
+Dumps PostgreSQL databases.
+
+exclude_dbs::
+  An array of database names to exclude from backup (optional).
+
+
 == Script Format
 
 PreBackup script is a Plain Old Shell Script (actually a Bash script to be precise) with few simple conventions (just like OpenRC runscripts, ebuilds etc.)
