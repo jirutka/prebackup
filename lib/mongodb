@@ -4,13 +4,33 @@
 # Variables:
 #   mongo_user     : Username for authentication (optional).
 #   mongo_password : Password for authentication (optional).
+#   exclude_dbs    : An array of database names to exclude from backup (optional).
+
+setup() {
+	if [ -n "$exclude_dbs" ] && ! is-array exclude_dbs; then
+		fail 'Variable $exclude_dbs must be an array!'
+	fi
+	exclude_dbs+=()
+}
 
 pre-backup() {
-	local opts=
+	local dbname
+	local opts='--quiet'
+	local list_dbs="db.adminCommand({listDatabases: 1})['databases'].forEach(function(e) { print(e.name) });"
+
 	if [ -n "$mongo_user" ]; then
-		opts="--username=$mongo_user --password=$mongo_password --authenticationDatabase=admin"
+		opts+=" --username=$mongo_user --password=$mongo_password --authenticationDatabase=admin"
 	fi
-	mongodump $opts --quiet --out="$target_dir"
+
+	mongo $opts --norc --eval="$list_dbs" | while read -r dbname; do
+
+		if is-member "$dbname" "${exclude_dbs[@]}"; then
+			info "Skipping database $dbname"
+		else
+			info "Dumping database $dbname"
+			mongodump $opts --db "$dbname" --out="$target_dir"
+		fi
+	done
 }
 
 post-backup() {
