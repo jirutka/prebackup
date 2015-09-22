@@ -173,13 +173,13 @@ is-member()::
 |       |   |-- config
 |       |   |-- post-backup ---------┐
 |       |   `-- pre-backup ----------┤
-|       `-- job2                     |
-|       |   |-- pre-backup -------┐  |
-|       |   `-- post-backup <-----┘  |
-|       `-- jobN                     |
-|       |   |-- config               |
-|       |   |-- post-backup ------┐  |
-|       |   `-- pre-backup -------┤  |
+|       `-- job2                     | s
+|       |   |-- pre-backup -------┐  | y
+|       |   `-- post-backup <-----┘  | m
+|       `-- jobN                     | l
+|       |   |-- config               | i
+|       |   |-- post-backup ------┐  | n
+|       |   `-- pre-backup -------┤  | k
 |       `-- prebackup.conf        |  |
 `-- usr(/local)                   |  |
     |-- bin                       |  |
