@@ -1,14 +1,16 @@
 #!/usr/local/bin/prebackup
 # vim: set ft=sh ts=4:
-
-setup() {
-	required-var 'mongo_user'
-	required-var 'mongo_password'
-}
+#
+# Variables:
+#   mongo_user     : Username for authentication (optional).
+#   mongo_password : Password for authentication (optional).
 
 pre-backup() {
-	mongodump --username="$mongo_user" --password="$mongo_password" \
-		--authenticationDatabase=admin --quiet --out="$target_dir"
+	local opts=
+	if [ -n "$mongo_user" ]; then
+		opts="--username=$mongo_user --password=$mongo_password --authenticationDatabase=admin"
+	fi
+	mongodump $opts --quiet --out="$target_dir"
 }
 
 post-backup() {
