@@ -1,5 +1,14 @@
 #!/usr/local/bin/prebackup
 # vim: set ft=sh ts=4:
+#
+# Variables:
+#   source_dev    : The device with Btrfs filesystem that contains the
+#                   subvolume you want to backup. Format is the same as in
+#                   mount (e.g. /dev/sda2, LABEL=btrfsvol). This variable is
+#                   required.
+#
+#   source_subvol : Name of the Btrfs subvolume that should be backed up. This
+#                   variable is required.
 
 setup() {
 	required-var 'source_dev'
