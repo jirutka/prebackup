@@ -151,6 +151,17 @@ required-var()::
 
   * $1: variable name
 
+is-array()::
+  Test if the specified variable is an array.
+
+  * $1: variable name
+
+is-member()::
+  Test if the first argument is equal to one of the subsequent arguments, i.e. if array `${@:2}` includes `$1`.
+
+  * $1: needle
+  * $@: elements
+
 
 == Recommended Directory Structure
 
@@ -158,22 +169,25 @@ required-var()::
 /
 |-- etc
 |   `-- bacula
-|       |-- service1
+|       |-- job1
 |       |   |-- config
-|       |   |-- post-backup ---------+
-|       |   `-- pre-backup ----------+
-|       `-- serviceN                 |
+|       |   |-- post-backup ---------┐
+|       |   `-- pre-backup ----------┤
+|       `-- job2                     |
+|       |   |-- pre-backup -------┐  |
+|       |   `-- post-backup <-----┘  |
+|       `-- jobN                     |
 |       |   |-- config               |
-|       |   |-- post-backup ------+  |
-|       |   `-- pre-backup -------+  |
+|       |   |-- post-backup ------┐  |
+|       |   `-- pre-backup -------┤  |
 |       `-- prebackup.conf        |  |
 `-- usr(/local)                   |  |
     |-- bin                       |  |
     |   `-- prebackup             |  |
     `-- share                     |  |
         `-- prebackup             |  |
-            |-- btrfs-snapshot <--+  |
-            |-- postgresql <---------+
+            |-- btrfs-snapshot <--┘  |
+            |-- postgresql <---------┘
             `-- ...
 ----
 
