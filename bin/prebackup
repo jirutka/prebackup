@@ -51,12 +51,9 @@ mkdir -p -m 750 "$target_dir"
 
 # If $RUN_AS is set and differs from the current user, then execute this script
 # under the $RUN_AS user and exit.
-if [[ -n "$RUN_AS" && "${RUN_AS%:*}" != "$(id -un)" ]]; then
-	chown "$RUN_AS" "$temp_dir" "$target_dir"
-
-	su "${RUN_AS%:*}" --preserve-environment <<-EOF
-		$0 $@
-	EOF
+if [[ -n "$RUN_AS" && "$RUN_AS" != "$(id -un)" ]]; then
+	echo "Executing as user: $RUN_AS" >&2
+	sudo -n -u "$RUN_AS" -- $0 $@
 	exit 0
 fi
 
