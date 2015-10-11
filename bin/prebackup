@@ -53,7 +53,7 @@ mkdir -p -m 750 "$target_dir"
 # under the $RUN_AS user and exit.
 if [[ -n "$RUN_AS" && "$RUN_AS" != "$(id -un)" ]]; then
 	echo "Executing as user: $RUN_AS" >&2
-	sudo -n -u "$RUN_AS" -- $0 $@
+	sudo -n -u "$RUN_AS" -- $@
 	exit 0
 fi
 
