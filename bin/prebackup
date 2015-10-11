@@ -1,8 +1,10 @@
 #!/bin/bash
 set -e
 
-# Run in clean environment.
-[ -n "$HOME" ] && exec -c "$@"
+# Re-execute in clean environment, but skip when running under sudo.
+if [[ -n "$HOME" && -z "$SUDO_USER" ]]; then
+	exec -c "$@"
+fi
 
 if [ ! -f "$1" ]; then
 	echo 'ERROR: Argument $1 is not set or not a file!' >&2
