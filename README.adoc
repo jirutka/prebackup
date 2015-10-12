@@ -27,7 +27,24 @@ The only requirement is that your backup software can execute some command befor
 
 === Manually
 
-TBD
+. Clone this repository and jump in:
++
+----
+git clone https://github.com/cvut/prebackup.git
+cd prebackup
+----
+
+. Install prebackup (you may need to run this with sudo)…
+.. into `/usr/local` (i.e. `/usr/local/bin` and `/usr/local/share/prebackup`):
++
+----
+./install
+----
+.. or into specified prefix, e.g. `/usr`:
++
+----
+PREFIX=/usr ./install
+----
 
 
 == Provided Scripts
