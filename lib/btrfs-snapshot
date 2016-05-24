@@ -14,21 +14,29 @@ setup() {
 	required-var 'source_dev'
 	required-var 'source_subvol'
 
-	target_dir=${target_dir}/${name}
+	target_dir="${target_dir}/${name}"
 	mount_point="${temp_dir}/${source_dev#*=}-${source_subvol}"
 }
 
 pre-backup() {
-	local snapshot_name="@${source_subvol}-$(date '+%s')"
+	local snapshot_name="@${source_subvol}-$(date '+%s')"  # unix timestamp
 
-	mkdir -p "$mount_point"
-	mount -t btrfs "$source_dev" "$mount_point"
+	if ! mountpoint -q "$mount_point"; then
+		mkdir -p "$mount_point"
+		mount -t btrfs "$source_dev" "$mount_point"
+	fi
 	btrfs subvolume snapshot -r "${mount_point}/${source_subvol}" "${mount_point}/${snapshot_name}"
 
+	if mountpoint -q "$target_dir"; then
+		log warning "Directory $target_dir is still mounted, unmounting it"
+		umount "$target_dir"
+	fi
 	mount -t btrfs "$source_dev" --read-only -o subvol="$snapshot_name" "$target_dir"
 }
 
 post-backup() {
+	mountpoint -q "$mount_point" || return 0
+
 	local snapshot_name=$(btrfs subvolume show "$target_dir" | sed -rn 's/\s*Name:\s+(.*)$/\1/p')
 
 	umount "$target_dir"
