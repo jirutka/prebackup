@@ -2,7 +2,7 @@
 set -e
 
 # Re-execute in clean environment, but skip when running under sudo.
-if [[ -n "$HOME" && -z "$SUDO_USER" ]]; then
+if [ -n "$HOME" ] && [ -z "$SUDO_USER" ]; then
 	exec -c "$@"
 fi
 
@@ -53,7 +53,7 @@ mkdir -p -m 750 "$target_dir"
 
 # If $RUN_AS is set and differs from the current user, then execute this script
 # under the $RUN_AS user and exit.
-if [[ -n "$RUN_AS" && "$RUN_AS" != "$(id -un)" ]]; then
+if [ -n "$RUN_AS" ] && [ "$RUN_AS" != "$(id -un)" ]; then
 	echo "Executing as user: $RUN_AS" >&2
 	sudo -n -u "$RUN_AS" -- $@
 	exit 0
@@ -86,7 +86,7 @@ done
 
 readonly NAME RUN_AS SYSLOG SYSLOG_TAG BASE_TARGET_DIR BASE_TEMP_DIR VERBOSE
 
-if [ "$SYSLOG" == 'yes' ]; then
+if [ "$SYSLOG" = 'yes' ]; then
 	# Redirect STDOUT and STDERR to syslog and STDOUT.
 	exec 1> >(tee | logger -t "$SYSLOG_TAG" -p local0.debug) 2>&1
 fi

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # NOTES
 # - Command "perl -pi" is a replacement for "sed -i" (edit files in-place) that

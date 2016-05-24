@@ -8,10 +8,10 @@ log() {
 	local msg=$2
 	[ -n "$level" ] || fail 'log: $1 must not be empty!'
 
-	if [ "$SYSLOG" == 'yes' ]; then
+	if [ "$SYSLOG" = 'yes' ]; then
 		logger -t "$SYSLOG_TAG" -p "local0.${level/error/err}" "$msg"
 
-	elif [[ "$level" != 'debug' || "$VERBOSE" == 'yes' ]]; then
+	elif [ "$level" != 'debug' ] || [ "$VERBOSE" = 'yes' ]; then
 		echo "${level^^}: $msg" >&2
 	fi
 }

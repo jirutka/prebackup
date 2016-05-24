@@ -15,7 +15,7 @@ setup() {
 	exclude_dbs+=( 'information_schema' 'performance_schema' )
 
 	myopts=
-	if [[ -n "$my_cnf_file" || -r ~/.my.cnf ]]; then
+	if [ -n "$my_cnf_file" ] || [ -r ~/.my.cnf ]; then
 		my_cnf_file=${my_cnf_file:-~/.my.cnf}
 		myopts="--defaults-extra-file=$(readlink -f "$my_cnf_file")"
 	fi
