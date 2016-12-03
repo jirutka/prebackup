@@ -5,24 +5,30 @@
 # 	doesn't work the same on GNU and BSD.
 # - We use absolute paths instead of "/usr/bin/env prebackup" for security
 #   reasons (think about implications of RUN_AS=root).
-set -e
+set -eu
 
-PREFIX="${PREFIX:-/usr/local}"
-BIN_DIR="${PREFIX}/bin"
-SHARE_DIR="${PREFIX}/share/prebackup"
+: ${DESTDIR:=}
+: ${PREFIX:="/usr/local"}
 
-mkdir -p "$BIN_DIR"
-cp -v bin/prebackup "$BIN_DIR"/
+BIN_DIR="$PREFIX/bin"
+SHARE_DIR="$PREFIX/share/prebackup"
 
-mkdir -p "$SHARE_DIR"
-cp -v lib/* "$SHARE_DIR"/
+cd "$(dirname "$0")"
 
-if [ "$SHARE_DIR" != '/usr/local/share/prebackup' ]; then
-	perl -pi -e "s|/usr/local/share/prebackup|${SHARE_DIR}/prebackup|" \
-		"$BIN_DIR"/prebackup
-fi
+install -Dv -m 755 bin/prebackup "${DESTDIR}${BIN_DIR}"/prebackup
+
+find lib -type f ! -name '*.sh' | while read path; do
+	install -Dv -m 755 "$path" "${DESTDIR}${SHARE_DIR}"/$(basename $path)
+done
+
+install -Dv -m 644 lib/utils.sh "${DESTDIR}${SHARE_DIR}"/utils.sh
 
 if [ "$BIN_DIR" != '/usr/local/bin' ]; then
-	perl -pi -e "s|#!/usr/local/bin/prebackup|#!${BIN_DIR}/prebackup|" \
-		"$SHARE_DIR"/*
+	perl -pi -e "s|#!/usr/local/bin/prebackup|#!$BIN_DIR/prebackup|" \
+		"${DESTDIR}${SHARE_DIR}"/*
+fi
+
+if [ "$SHARE_DIR" != '/usr/local/share/prebackup' ]; then
+	perl -pi -e "s|/usr/local/share/prebackup|$SHARE_DIR|" \
+		"${DESTDIR}${BIN_DIR}"/prebackup
 fi
