@@ -1,10 +1,10 @@
 #!/usr/local/bin/prebackup
 # vim: set ft=sh ts=4:
 
-pre-backup() {
+pre_backup() {
 	: # do nothing
 }
 
-post-backup() {
+post_backup() {
 	: # do nothing
 }

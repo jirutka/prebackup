@@ -4,24 +4,24 @@
 # Variables:
 #   mongo_user     : Username for authentication (optional).
 #   mongo_password : Password for authentication (optional).
-#   exclude_dbs    : An array of database names to exclude from backup (optional).
+#   exclude_dbs    : A list of database names to exclude from backup (optional).
 
 setup() {
-	exclude_dbs+=()
+	: ${exclude_dbs:=}
 }
 
-pre-backup() {
+pre_backup() {
 	local dbname
 	local opts='--quiet'
 	local list_dbs="db.adminCommand({listDatabases: 1})['databases'].forEach(function(e) { print(e.name) });"
 
 	if [ -n "$mongo_user" ]; then
-		opts+=" --username=$mongo_user --password=$mongo_password --authenticationDatabase=admin"
+		opts="$opts --username='$mongo_user' --password='$mongo_password' --authenticationDatabase=admin"
 	fi
 
 	mongo $opts --norc --eval="$list_dbs" | while read -r dbname; do
 
-		if list_has "$dbname" "${exclude_dbs[@]}"; then
+		if list_has "$dbname" $exclude_dbs; then
 			info "Skipping database $dbname"
 		else
 			info "Dumping database $dbname"
@@ -30,7 +30,7 @@ pre-backup() {
 	done
 }
 
-post-backup() {
+post_backup() {
 	if [ ! -d "$target_dir" ]; then
 		fail "$target_dir does not exist or not a directory!"
 	fi

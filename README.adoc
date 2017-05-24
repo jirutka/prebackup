@@ -63,7 +63,7 @@ source_subvol::
 Dumps MariaDB (formerly MySQL) databases.
 
 exclude_dbs::
-  An array of database names to exclude from backup (optional).
+  A list of database names to exclude from backup (optional).
 my_cnf_file::
   Path of mysql/mariadb options file that will be passed to `--defaults-extra-file`.This is a way how you can provide credentials for DB server. Default is `~/.my.cnf`.
 
@@ -72,7 +72,7 @@ my_cnf_file::
 Dumps MongoDB databases.
 
 exclude_dbs::
-  An array of database names to exclude from backup (optional).
+  A list of database names to exclude from backup (optional).
 mongo_password::
   Password for authentication (optional).
 mongo_user::
@@ -87,7 +87,7 @@ Does nothing…
 Dumps PostgreSQL databases.
 
 exclude_dbs::
-  An array of database names to exclude from backup (optional).
+  A list of database names to exclude from backup (optional).
 
 
 == Script Format
@@ -95,17 +95,17 @@ exclude_dbs::
 PreBackup script is a Plain Old Shell Script (actually a Bash script to be precise) with few simple conventions (just like OpenRC runscripts, ebuilds etc.)
 
 You should use https://en.wikipedia.org/wiki/Shebang_%28Unix%29[shebang] with path of the master link:bin/prebackup[prebackup] script.
-Then you must define functions `pre-backup`, `post-backup` and optionally `setup`.
+Then you must define functions `pre_backup`, `post_backup` and optionally `setup`.
 
 setup()::
-  If defined, this function is executed before each `pre-backup()` and `post-backup()`, in the same environment.
-  You may use it to check for required variables (using `required_var()`), to define some common variables or anything else that should be run before `pre-backup()` and `post-backup()`.
+  If defined, this function is executed before each `pre_backup()` and `post_backup()`, in the same environment.
+  You may use it to check for required variables (using `required_var()`), to define some common variables or anything else that should be run before `pre_backup()` and `post_backup()`.
 
-pre-backup()::
+pre_backup()::
   This function is executed when you run the script as a file named `pre-backup` (e.g. using symlink) or with argument `-c pre-backup`.
   As the name suggests, it should be run _before_ actual backup, e.g. to dump database, create filesystem snapshot, …
 
-post-backup()::
+post_backup()::
   This function is executed when you run the script as a file named `post-backup` (e.g. using symlink) or with argument `-c post-backup`.
   It should be run _after_ actual backup, e.g. to clean database dumps, destroy filesystem snapshot, …
 
@@ -116,14 +116,14 @@ post-backup()::
 # vim: set ft=sh ts=4:
 
 setup() {
-    echo 'Run before pre-backup and post-backup function.'
+    echo 'Run before pre_backup and post_backup function.'
 }
 
-pre-backup() {
+pre_backup() {
     echo 'Run before actual backup.'
 }
 
-post-backup() {
+post_backup() {
     echo 'Run after actual backup.'
 }
 ----

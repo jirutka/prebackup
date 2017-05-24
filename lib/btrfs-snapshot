@@ -18,7 +18,7 @@ setup() {
 	mount_point="${temp_dir}/${source_dev#*=}-${source_subvol}"
 }
 
-pre-backup() {
+pre_backup() {
 	local snapshot_name="@${source_subvol}-$(date '+%s')"  # unix timestamp
 
 	if ! mountpoint -q "$mount_point"; then
@@ -34,10 +34,10 @@ pre-backup() {
 	mount -t btrfs "$source_dev" --read-only -o subvol="$snapshot_name" "$target_dir"
 }
 
-post-backup() {
+post_backup() {
 	mountpoint -q "$mount_point" || return 0
 
-	local snapshot_name=$(btrfs subvolume show "$target_dir" | sed -rn 's/\s*Name:\s+(.*)$/\1/p')
+	local snapshot_name=$(btrfs subvolume show "$target_dir" | sed -En 's/\s*Name:\s+(.*)$/\1/p')
 
 	umount "$target_dir"
 	btrfs subvolume delete "$mount_point/$snapshot_name"

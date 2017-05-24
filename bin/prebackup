@@ -100,9 +100,14 @@ if type -t setup &>/dev/null; then
 fi
 
 case "$command" in
-	pre-backup | post-backup)
+	pre-backup)
 		info "Running $command for $NAME"
-		eval $command
+		pre_backup
+		info "Completed $command for $NAME"
+		;;
+	post-backup)
+		info "Running $command for $NAME"
+		post_backup
 		info "Completed $command for $NAME"
 		;;
 	*)

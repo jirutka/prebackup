@@ -2,13 +2,13 @@
 # vim: set ft=sh ts=4:
 #
 # Variables:
-#   exclude_dbs : An array of database names to exclude from backup (optional).
+#   exclude_dbs : A list of database names to exclude from backup (optional).
 
 setup() {
-	exclude_dbs+=( 'template0' )
+	exclude_dbs="template0 ${exclude_dbs:-}"
 }
 
-pre-backup() {
+pre_backup() {
 	local dbname
 	local dbs_list_sql='SELECT datname FROM pg_database ORDER BY datname;'
 	local psql_opts='--no-psqlrc --no-align --tuples-only'
@@ -18,7 +18,7 @@ pre-backup() {
 
 	psql $psql_opts --command="$dbs_list_sql" | while read -r dbname; do
 
-		if list_has "$dbname" "${exclude_dbs[@]}"; then
+		if list_has "$dbname" $exclude_dbs; then
 			info "Skipping database $dbname"
 		else
 			info "Dumping database $dbname"
@@ -27,7 +27,7 @@ pre-backup() {
 	done
 }
 
-post-backup() {
+post_backup() {
 	if [ ! -d "$target_dir" ]; then
 		fail "$target_dir does not exist or not a directory!"
 	fi
