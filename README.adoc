@@ -92,7 +92,7 @@ exclude_dbs::
 
 == Script Format
 
-PreBackup script is a Plain Old Shell Script (actually a Bash script to be precise) with few simple conventions (just like OpenRC runscripts, ebuilds etc.)
+PreBackup script is a Plain Old Shell Script (POSIX-compliant with `local` and `readonly` builtins) with few simple conventions (just like OpenRC runscripts, ebuilds etc.)
 
 You should use https://en.wikipedia.org/wiki/Shebang_%28Unix%29[shebang] with path of the master link:bin/prebackup[prebackup] script.
 Then you must define functions `pre_backup`, `post_backup` and optionally `setup`.
