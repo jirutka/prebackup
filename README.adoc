@@ -99,7 +99,7 @@ Then you must define functions `pre-backup`, `post-backup` and optionally `setup
 
 setup()::
   If defined, this function is executed before each `pre-backup()` and `post-backup()`, in the same environment.
-  You may use it to check for required variables (using `required-var()`), to define some common variables or anything else that should be run before `pre-backup()` and `post-backup()`.
+  You may use it to check for required variables (using `required_var()`), to define some common variables or anything else that should be run before `pre-backup()` and `post-backup()`.
 
 pre-backup()::
   This function is executed when you run the script as a file named `pre-backup` (e.g. using symlink) or with argument `-c pre-backup`.
@@ -206,18 +206,13 @@ debug()::
 
   * $1: message
 
-required-var()::
+required_var()::
   If the specified variable is empty, then log error message and exit.
 
   * $1: variable name
 
-is-array()::
-  Test if the specified variable is an array.
-
-  * $1: variable name
-
-is-member()::
-  Test if the first argument is equal to one of the subsequent arguments, i.e. if array `${@:2}` includes `$1`.
+list_has()::
+  Test if the first argument is equal to one of the subsequent arguments, i.e. if list `${@:2}` includes `$1`.
 
   * $1: needle
   * $@: elements

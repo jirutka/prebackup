@@ -7,9 +7,6 @@
 #   exclude_dbs    : An array of database names to exclude from backup (optional).
 
 setup() {
-	if [ -n "$exclude_dbs" ] && ! is-array exclude_dbs; then
-		fail 'Variable $exclude_dbs must be an array!'
-	fi
 	exclude_dbs+=()
 }
 
@@ -24,7 +21,7 @@ pre-backup() {
 
 	mongo $opts --norc --eval="$list_dbs" | while read -r dbname; do
 
-		if is-member "$dbname" "${exclude_dbs[@]}"; then
+		if list_has "$dbname" "${exclude_dbs[@]}"; then
 			info "Skipping database $dbname"
 		else
 			info "Dumping database $dbname"

@@ -9,10 +9,12 @@ log() {
 	[ -n "$level" ] || fail 'log: $1 must not be empty!'
 
 	if [ "$SYSLOG" = 'yes' ]; then
-		logger -t "$SYSLOG_TAG" -p "local0.${level/error/err}" "$msg"
+		[ "$level" != 'error' ] || level='err'
+		logger -t "$SYSLOG_TAG" -p "local0.$level" "$msg"
 
 	elif [ "$level" != 'debug' ] || [ "$VERBOSE" = 'yes' ]; then
-		echo "${level^^}: $msg" >&2
+		level=$(echo "$level" | tr '[a-z]' '[A-Z]')
+		printf '%s\n' "$level: $msg" >&2
 	fi
 }
 
@@ -36,27 +38,34 @@ debug() {
 	log debug "$1"
 }
 
+# Print value of the specified variable, or the default if empty or not defined.
+# $1: variable name
+# $2: default value (default: "")
+getvar() {
+	local name="$1"
+	local default="${2:-}"
+
+	eval "printf '%s\n' \"\${$name:-$default}\""
+}
+
 # If the specified variable is empty, then log error message and exit.
 # $1: variable name
-required-var() {
-	if [ -z "${!1}" ]; then
+required_var() {
+	if [ -z "$(getvar "$1")" ]; then
 		fail "Variable $1 must not be empty!" 3
 	fi
 }
 
-# Test if the specified variable is an array.
-# $1: variable name
-is-array() {
-	[[ "$(declare -p $1 2>/dev/null)" =~ 'declare -a' ]]
-}
-
 # Test if the first argument is equal to one of the subsequent arguments,
-# i.e. if array ${@:2} includes $1.
+# i.e. if list ${@:2} includes $1.
 # $1: needle
 # $@: elemenets
-is-member() {
-	local needle="$1"
-	local sep=$'\x1F'
-	shift
-	[[ "$(printf "${sep}%s${sep}" "$@")" == *"${sep}${needle}${sep}"* ]]
+list_has() {
+	local needle="$1"; shift
+	local haystack="$@"
+
+	local i; for i in $haystack; do
+		[ "$i" != "$needle" ] || return 0
+	done
+	return 1
 }

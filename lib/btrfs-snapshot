@@ -11,8 +11,8 @@
 #                   variable is required.
 
 setup() {
-	required-var 'source_dev'
-	required-var 'source_subvol'
+	required_var 'source_dev'
+	required_var 'source_subvol'
 
 	target_dir="${target_dir}/${name}"
 	mount_point="${temp_dir}/${source_dev#*=}-${source_subvol}"

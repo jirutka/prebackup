@@ -9,9 +9,6 @@
 #                 credentials for DB server. Default is ~/.my.cnf.
 
 setup() {
-	if [ -n "$exclude_dbs" ] && ! is-array exclude_dbs; then
-		fail 'Variable $exclude_dbs must be an array!'
-	fi
 	exclude_dbs+=( 'information_schema' 'performance_schema' )
 
 	myopts=
@@ -26,7 +23,7 @@ pre-backup() {
 
 	mysql $myopts --batch --skip-column-names -e 'show databases' | while read -r dbname; do
 
-		if is-member "$dbname" "${exclude_dbs[@]}"; then
+		if list_has "$dbname" "${exclude_dbs[@]}"; then
 			info "Skipping database $dbname"
 		else
 			info "Dumping database $dbname"
