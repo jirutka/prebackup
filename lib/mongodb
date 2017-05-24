@@ -6,10 +6,6 @@
 #   mongo_password : Password for authentication (optional).
 #   exclude_dbs    : A list of database names to exclude from backup (optional).
 
-setup() {
-	: ${exclude_dbs:=}
-}
-
 pre_backup() {
 	local dbname
 	local opts='--quiet'
@@ -21,7 +17,7 @@ pre_backup() {
 
 	mongo $opts --norc --eval="$list_dbs" | while read -r dbname; do
 
-		if list_has "$dbname" $exclude_dbs; then
+		if list_has "$dbname" ${exclude_dbs:-""}; then
 			info "Skipping database $dbname"
 		else
 			info "Dumping database $dbname"

@@ -4,9 +4,7 @@
 # Variables:
 #   exclude_dbs : A list of database names to exclude from backup (optional).
 
-setup() {
-	exclude_dbs="template0 ${exclude_dbs:-}"
-}
+exclude_dbs="template0 ${exclude_dbs:-}"
 
 pre_backup() {
 	local dbname

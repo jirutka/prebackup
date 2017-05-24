@@ -8,9 +8,9 @@
 #                 --defaults-extra-file. This is a way how you can provide
 #                 credentials for DB server. Default is ~/.my.cnf.
 
-setup() {
-	exclude_dbs="information_schema performance_schema ${exclude_dbs:-}"
+exclude_dbs="information_schema performance_schema ${exclude_dbs:-}"
 
+setup() {
 	myopts=
 	if [ -n "$my_cnf_file" ] || [ -r ~/.my.cnf ]; then
 		my_cnf_file=${my_cnf_file:-~/.my.cnf}
