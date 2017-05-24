@@ -206,6 +206,21 @@ debug()::
 
   * $1: message
 
+check_dir_exists()::
+  Check if the specified path is a directory and fail if it's not.
+
+  * $1: path to check
+
+check_file_nonempty()::
+  Check if the specified path is a non-empty file and fail if it's not.
+
+  * $1: path to check
+
+check_gzip_nonempty()::
+  Check if the specified path is a non-empty gzip file, fail if it's not.
+
+  * $1: path to check
+
 required_var()::
   If the specified variable is empty, then log error message and exit.
 

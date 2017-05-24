@@ -38,6 +38,36 @@ debug() {
 	log debug "$1"
 }
 
+# Check if the specified path is a directory, fail if it's not.
+# $1: path to check
+check_dir_exists() {
+	local path="$1"
+
+	test -d "$path" || fail "$path does not exist or not a directory!"
+}
+
+# Check if the specified path is a non-empty file, fail if it's not.
+# $1: path to check
+check_file_nonempty() {
+	local path="$1"
+
+	test -f "$path" || fail "$path does not exist or not a file!"
+	test -s "$path" || fail "File $path is empty!"
+}
+
+# Check if the specified path is a non-empty gzip file, fail if it's not.
+# $1: path to check
+check_gzip_nonempty() {
+	local path="$1"
+
+	test -f "$path" || fail "$path does not exist or not a file!"
+
+	local out; out=$(gzip -cd "$path" | cut -c1 2>/dev/null) \
+		|| fail "File $path is not a valid gzip archive!"
+
+	test -n "$out" || fail "Gzip file $path is empty!"
+}
+
 # Print value of the specified variable, or the default if empty or not defined.
 # $1: variable name
 # $2: default value (default: "")

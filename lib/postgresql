@@ -15,6 +15,7 @@ pre_backup() {
 
 	info 'Dumping global objects'
 	pg_dumpall --globals-only | gzip > "$target_dir/globals.sql.gz"
+	check_gzip_nonempty "$target_dir/globals.sql.gz"
 
 	psql $psql_opts --command="$dbs_list_sql" | while read -r dbname; do
 
@@ -23,14 +24,14 @@ pre_backup() {
 		else
 			info "Dumping database $dbname"
 			pg_dump --dbname="$dbname" --format=c --file="${target_dir}/${dbname}.dump"
+			check_file_nonempty "${target_dir}/${dbname}.dump"
 		fi
 	done
 }
 
 post_backup() {
-	if [ ! -d "$target_dir" ]; then
-		fail "$target_dir does not exist or not a directory!"
-	fi
+	check_dir_exists "$target_dir"
+
 	rm -Rf "$target_dir"/globals.sql.gz
 	rm -Rf "$target_dir"/*.dump
 }

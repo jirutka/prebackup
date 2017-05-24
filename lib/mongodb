@@ -31,8 +31,7 @@ pre_backup() {
 }
 
 post_backup() {
-	if [ ! -d "$target_dir" ]; then
-		fail "$target_dir does not exist or not a directory!"
-	fi
+	check_dir_exists "$target_dir"
+
 	rm -Rf "$target_dir"/*
 }
