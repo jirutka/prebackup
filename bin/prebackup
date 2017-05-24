@@ -1,9 +1,9 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
 # Re-execute in clean environment, but skip when running under sudo.
 if [ -n "$HOME" ] && [ -z "$SUDO_USER" ]; then
-	exec -c "$@"
+	exec env -i "$@"
 fi
 
 if [ ! -f "$1" ]; then
@@ -16,10 +16,7 @@ readonly SHARE_DIR='/usr/local/share/prebackup'
 readonly SCRIPT_FILE="$1"
 readonly SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_FILE")" && pwd)"
 
-configs=(
-	'/etc/bacula/prebackup.conf'
-	"${SCRIPT_DIR}/config"
-)
+configs="/etc/bacula/prebackup.conf $SCRIPT_DIR/config"
 command="$(basename "$SCRIPT_FILE")"
 
 # Global variables that may be overriden by a config file or CLI arguments,
@@ -32,13 +29,13 @@ BASE_TEMP_DIR='/tmp/prebackup'
 VERBOSE='no'
 
 # Include shared utils.
-source "$SHARE_DIR/utils.sh"
+. "$SHARE_DIR/utils.sh"
 
 # Include config files.
-for file in "${configs[@]}"; do
+for file in $configs; do
 	if [ -f "$file" ]; then
-		echo "Loading variables from: $(readlink -f $file)" >&2
-		source "$file"
+		echo "Loading variables from: $(readlink -f "$file")" >&2
+		. "$file"
 	fi
 done
 
@@ -87,15 +84,21 @@ done
 readonly NAME RUN_AS SYSLOG SYSLOG_TAG BASE_TARGET_DIR BASE_TEMP_DIR VERBOSE
 
 if [ "$SYSLOG" = 'yes' ]; then
-	# Redirect STDOUT and STDERR to syslog and STDOUT.
-	exec 1> >(tee | logger -t "$SYSLOG_TAG" -p local0.debug) 2>&1
+	# Redirect STDOUT and STDERR to syslog and STDERR.
+
+	logfifo=$(mktemp -u)
+	mkfifo "$logfifo"
+	logger -s -t "$SYSLOG_TAG" -p local0.debug < "$logfifo" &
+	exec 1> "$logfifo" 2> "$logfifo"
+
+	trap "rm '$logfifo'" EXIT
 fi
 
 # Include actual script (hook) file.
-source "$SCRIPT_FILE"
+. "$SCRIPT_FILE"
 
 # Run setup hook if defined.
-if type -t setup &>/dev/null; then
+if type -t setup >/dev/null 2>&1; then
 	setup
 fi
 
