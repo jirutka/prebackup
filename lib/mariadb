@@ -27,8 +27,8 @@ pre_backup() {
 			info "Skipping database $dbname"
 		else
 			info "Dumping database $dbname"
-			mysqldump $myopts --databases "$dbname" | gzip > "${target_dir}/${dbname}.sql.gz"
-			check_gzip_nonempty "${target_dir}/${dbname}.sql.gz"
+			mysqldump $myopts --databases "$dbname" | gzip > "$target_dir/$dbname.sql.gz"
+			check_gzip_nonempty "$target_dir/$dbname.sql.gz"
 		fi
 	done
 }

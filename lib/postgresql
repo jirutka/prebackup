@@ -21,8 +21,8 @@ pre_backup() {
 			info "Skipping database $dbname"
 		else
 			info "Dumping database $dbname"
-			pg_dump --dbname="$dbname" --format=c --file="${target_dir}/${dbname}.dump"
-			check_file_nonempty "${target_dir}/${dbname}.dump"
+			pg_dump --dbname="$dbname" --format=c --file="$target_dir/$dbname.dump"
+			check_file_nonempty "$target_dir/$dbname.dump"
 		fi
 	done
 }
