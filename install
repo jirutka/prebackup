@@ -1,8 +1,6 @@
 #!/bin/sh
 #
 # NOTES
-# - Command "perl -pi" is a replacement for "sed -i" (edit files in-place) that
-# 	doesn't work the same on GNU and BSD.
 # - We use absolute paths instead of "/usr/bin/env prebackup" for security
 #   reasons (think about implications of RUN_AS=root).
 set -eu
@@ -12,6 +10,14 @@ set -eu
 
 BIN_DIR="$PREFIX/bin"
 SHARE_DIR="$PREFIX/share/prebackup"
+
+sed_inplace() {
+	if sed --version >/dev/null 2>&1; then
+		sed -r -i'' "$@"  # GNU or Busybox sed
+	else
+		sed -E -i '' "$@"  # BSD sed
+	fi
+}
 
 cd "$(dirname "$0")"
 
@@ -24,11 +30,11 @@ done
 install -Dv -m 644 lib/utils.sh "${DESTDIR}${SHARE_DIR}"/utils.sh
 
 if [ "$BIN_DIR" != '/usr/local/bin' ]; then
-	perl -pi -e "s|#!/usr/local/bin/prebackup|#!$BIN_DIR/prebackup|" \
+	sed_inplace "s|#!/usr/local/bin/prebackup|#!$BIN_DIR/prebackup|" \
 		"${DESTDIR}${SHARE_DIR}"/*
 fi
 
 if [ "$SHARE_DIR" != '/usr/local/share/prebackup' ]; then
-	perl -pi -e "s|/usr/local/share/prebackup|$SHARE_DIR|" \
+	sed_inplace "s|/usr/local/share/prebackup|$SHARE_DIR|" \
 		"${DESTDIR}${BIN_DIR}"/prebackup
 fi
